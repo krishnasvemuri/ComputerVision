@@ -1,0 +1,131 @@
+<html>
+<head>
+<title>CS 682 Homework 2 part 1</title>
+</head>
+<body>
+<style>
+         body {
+         background-color: 	#dfe3ee;
+         }
+		 
+		 h2,h3,h4,p{
+		 color :#3b5998;
+		 }
+      </style>
+<center><h2><pre>
+Krishna Sindhuri Vemuri
+G01024066 
+CS 682 Homework 2 
+</pre></h2></center>
+<h2><a href="https://s3.amazonaws.com/cs682vemuri/CS682_HW2_REPORT_VEMURI.pdf" target="_blank">Please find the report here</a></h2> 
+<center><h3>Python script for part1 of the homework</h3></center>
+<hr>
+<pre>
+#import all the required python libraries
+
+import tkinter as tk
+import numpy as np
+import cv2
+from tkinter import filedialog
+import os
+from matplotlib import pyplot as plt
+
+#This function is responsible for  displaying the 11 * 11 image window on left button mouse click
+#Also displays the pixel values, RGB values and intensity at the location
+#mean and standard deviation of the image window 
+
+def mouse_move(event,x,y,flags,param):
+    while(1):
+        if event == cv2.EVENT_LBUTTONDOWN:
+           crop_img = img[y-5:y+5,x-5:x+5]
+           constant= cv2.copyMakeBorder(crop_img,2,2,2,2,cv2.BORDER_CONSTANT,value=(255,255,255))
+           cv2.namedWindow('cropped',cv2.WINDOW_NORMAL)
+           cv2.imshow('cropped', constant)
+           pix=[x,y]
+           print('The location of the pixel',pix)
+           b,g,r=img[x,y]
+           R=np.uint16(r)
+           G=np.uint16(g)
+           B=np.uint16(b)
+           print ('The R G B values of the pixel are',R,G,B)
+           print ('The intensity of the pixel are',float((R + G + B) / 3))
+           mean,sdeviation=cv2.meanStdDev(crop_img)
+           bm,gm,rm=mean
+           bs,gs,rs=sdeviation
+           print ('The mean of the 11 * 11 window is',rm,gm,bm)
+           print ('The standard deviation of the 11 * 11 window is',rs,gs,bs)
+        if cv2.waitKey(20) & 0xFF == 27:
+            break
+
+#Defined the type of files that can be loaded
+
+my_filetypes = [('png', '.png'),('bnp', '.bnp'),('tiff', '.tiff'),('jpg','.jpg')]
+
+#Using the tkinter library used the file explorer to select the required image
+
+answer = filedialog.askopenfilename(initialdir=os.getcwd(),
+                                    title="Please select an image:",
+                                    filetypes=my_filetypes)
+img = cv2.imread(answer)
+cv2.imshow('image',img)
+cv2.waitKey(0)
+
+#Split the channels of the image to get the coor spaces which are used to create a histogram 
+
+channels = cv2.split(img)
+colors = ("b", "g", "r")
+for(channel, c) in zip(channels, colors):
+    histogram = cv2.calcHist([channel], [0], None, [256], [0, 256])
+    plt.plot(histogram, color = c)
+    plt.xlim([0, 256])
+plt.show()
+
+#Call the function mouse_move on the image
+
+cv2.namedWindow('image',cv2.WINDOW_NORMAL)
+cv2.setMouseCallback('image',mouse_move)
+
+#While true, open the image and close the image window when close button the image is clicked 
+
+while(1):
+    cv2.imshow('image',img)
+    cv2.resizeWindow('image',500,500)
+    cv2.waitKey(0)
+    if cv2.waitKey(20) & 0xFF == 27:
+        break
+    cv2.destroyAllWindows()
+
+</pre>
+
+
+<center><h3>Results of part1</h3></center>
+<hr>
+<h4>Once , you run the program, the file dialog is opened to select the required image </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/1.PNG" style="width:600px;height:600px;">
+<h4>I have selected 'krishna.png' to test my program </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/2.PNG" style="width:600px;height:600px;">
+<h4>Image is displayed once it is selected </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/3.PNG" style="width:600px;height:600px;">
+<h4>The histogram of the image krishna.png is generated</h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/4.PNG" style="width:600px;height:600px;">
+<h4>The image is opened to get the image windows(11 * 11)</h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/5.PNG" style="width:600px;height:600px;">
+<h4>Once clicked on a pixel an enlarged window of 13*13 size is opened (2 units of white pixels are added on each side,but not included when the mean and standard deviation are calculated) </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/6.PNG" style="width:600px;height:600px;">
+<h4>Print values of another pixel</h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/7.PNG" style="width:600px;height:600px;">
+<h3>Homogeneous pictures<h3> 
+<h4>The following pictures are homogeneous as there is no much difference in their means and standard deviation </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/8a.PNG" style="width:600px;height:600px;">
+<img src="https://s3.amazonaws.com/cs682vemuri/8b.PNG" style="width:600px;height:600px;">
+<h3>Inhomogeneous pictures<h3> 
+<h4>The following pictures are homogeneous as there is a lot of difference in their means and standard deviation </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/9a.PNG" style="width:600px;height:600px;">
+<img src="https://s3.amazonaws.com/cs682vemuri/9b.PNG" style="width:600px;height:600px;">
+
+<h4>By comparing the histograms of krishna.png(left) and krishna.jpg(right) we can see that the .jpg version shows compressed results  </h4>
+<img src="https://s3.amazonaws.com/cs682vemuri/4.PNG" style="width:600px;height:600px;">
+<img src="https://s3.amazonaws.com/cs682vemuri/10.PNG" style="width:600px;height:600px;">
+
+</body>
+</html>
